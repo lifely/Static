@@ -218,24 +218,8 @@ extension DataSource: UITableViewDataSource {
         return section(at: sectionIndex)?.header?._title
     }
 
-    public func tableView(_ tableView: UITableView, viewForHeaderInSection sectionIndex: Int) -> UIView? {
-        return section(at: sectionIndex)?.header?._view
-    }
-
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection sectionIndex: Int) -> CGFloat {
-        return section(at: sectionIndex)?.header?.viewHeight ?? tableView.style.defaultSectionExtremityHeight
-    }
-
     public func tableView(_ tableView: UITableView, titleForFooterInSection sectionIndex: Int) -> String? {
         return section(at: sectionIndex)?.footer?._title
-    }
-
-    public func tableView(_ tableView: UITableView, viewForFooterInSection sectionIndex: Int) -> UIView? {
-        return section(at: sectionIndex)?.footer?._view
-    }
-
-    public func tableView(_ tableView: UITableView, heightForFooterInSection sectionIndex: Int) -> CGFloat {
-        return section(at: sectionIndex)?.footer?.viewHeight ?? tableView.style.defaultSectionExtremityHeight
     }
 
     public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -259,6 +243,7 @@ extension DataSource: UITableViewDataSource {
         }
         return max(index, sections.count - 1)
     }
+
 }
 
 
