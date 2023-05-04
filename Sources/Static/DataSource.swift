@@ -242,7 +242,70 @@ extension DataSource: UITableViewDataSource {
         return row(at: indexPath)?.canEdit ?? false
     }
 
+    public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+
+    public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+        guard let sectionIndexTitles = sectionIndexTitles, sectionIndexTitles.count >= sections.count else { return nil }
+        return sectionIndexTitles
+    }
+
+    public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
+        for (i, section) in sections.enumerated() {
+            if let indexTitle = section.indexTitle, indexTitle == title {
+                return i
+            }
+        }
+        return max(index, sections.count - 1)
+    }
+}
+
+
+extension DataSource: UITableViewDelegate {
+
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection sectionIndex: Int) -> CGFloat {
+        return section(at: sectionIndex)?.header?.viewHeight ?? tableView.style.defaultSectionExtremityHeight
+    }
+
+    public func tableView(_ tableView: UITableView, heightForFooterInSection sectionIndex: Int) -> CGFloat {
+        return section(at: sectionIndex)?.footer?.viewHeight ?? tableView.style.defaultSectionExtremityHeight
+    }
+
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection sectionIndex: Int) -> UIView? {
+        return section(at: sectionIndex)?.header?._view
+    }
+
+    public func tableView(_ tableView: UITableView, viewForFooterInSection sectionIndex: Int) -> UIView? {
+        return section(at: sectionIndex)?.footer?._view
+    }
+
+    public func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        if let row = row(at: indexPath) {
+            row.accessory.selection?()
+        }
+
+        tableViewDelegate?.tableView?(tableView, accessoryButtonTappedForRowWith: indexPath)
+    }
+
+    public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        return row(at: indexPath)?.isSelectable ?? false
+    }
+
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if automaticallyDeselectRows {
+            tableView.deselectRow(at: indexPath as IndexPath, animated: true)
+        }
+
+        if let row = row(at: indexPath) {
+            row.selection?()
+        }
+
+        tableViewDelegate?.tableView?(tableView, didSelectRowAt: indexPath)
+    }
+
     @objc(tableView:editActionsForRowAtIndexPath:)
+    @available(iOS, introduced: 8.0, deprecated: 13.0)
     public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         return row(at: indexPath)?.editActions.map {
             action in
@@ -265,45 +328,24 @@ extension DataSource: UITableViewDataSource {
         }
     }
 
-    public func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        guard let sectionIndexTitles = sectionIndexTitles, sectionIndexTitles.count >= sections.count else { return nil }
-        return sectionIndexTitles
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView,
+                          leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return row(at: indexPath)?.leadingSwipeActionsConfiguration.map {
+            let actionsConfiguration = UISwipeActionsConfiguration(actions: $0.actions)
+            actionsConfiguration.performsFirstActionWithFullSwipe = $0.performsFirstActionWithFullSwipe
+            return actionsConfiguration
+        }
     }
 
-    public func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
-        for (i, section) in sections.enumerated() {
-            if let indexTitle = section.indexTitle, indexTitle == title {
-                return i
-            }
+    @available(iOS 11.0, *)
+    public func tableView(_ tableView: UITableView,
+                          trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return row(at: indexPath)?.trailingSwipeActionsConfiguration.map {
+            let actionsConfiguration = UISwipeActionsConfiguration(actions: $0.actions)
+            actionsConfiguration.performsFirstActionWithFullSwipe = $0.performsFirstActionWithFullSwipe
+            return actionsConfiguration
         }
-        return max(index, sections.count - 1)
-    }
-}
-
-
-extension DataSource: UITableViewDelegate {
-    public func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        return row(at: indexPath)?.isSelectable ?? false
-    }
-
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if automaticallyDeselectRows {
-            tableView.deselectRow(at: indexPath as IndexPath, animated: true)
-        }
-
-        if let row = row(at: indexPath) {
-            row.selection?()
-        }
-
-        tableViewDelegate?.tableView?(tableView, didSelectRowAt: indexPath)
-    }
-
-    public func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        if let row = row(at: indexPath) {
-            row.accessory.selection?()
-        }
-
-        tableViewDelegate?.tableView?(tableView, accessoryButtonTappedForRowWith: indexPath)
     }
 }
 

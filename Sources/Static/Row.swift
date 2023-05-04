@@ -138,6 +138,14 @@ public struct Row: Hashable, Equatable {
     /// Actions to show when swiping the cell, such as Delete.
     public var editActions: [EditAction]
 
+    /// Returns the swipe actions to display on the leading edge of the row.
+    public var leadingSwipeActionsConfiguration: SwipeActionsConfiguration?
+
+    /// Returns the swipe actions to display on the trailing edge of the row.
+    public var trailingSwipeActionsConfiguration: SwipeActionsConfiguration?
+
+    // MARK: - Computed Properties
+
     var canEdit: Bool {
         return editActions.count > 0
     }
