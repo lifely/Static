@@ -6,12 +6,12 @@ public typealias ValueChange = (Bool) -> ()
 public typealias SegmentedControlValueChange = (Int, Any?) -> ()
 
 /// Representation of a table row.
-public struct Row: Hashable, Equatable {
+public struct Row: Hashable {
 
     // MARK: - Types
 
     /// Representation of a row accessory.
-    public enum Accessory: Equatable {
+    public enum Accessory {
         /// No accessory
         case none
 
@@ -162,7 +162,6 @@ public struct Row: Hashable, Equatable {
         hasher.combine(uuid)
     }
 
-
     // MARK: - Initializers
 
     public init(text: String? = nil, detailText: String? = nil, selection: Selection? = nil,
@@ -182,20 +181,29 @@ public struct Row: Hashable, Equatable {
     }
 }
 
+// MARK: - Extensions & Protocols
+// MARK: - Equatable
 
-public func ==(lhs: Row, rhs: Row) -> Bool {
-    return lhs.uuid == rhs.uuid
+extension Row: Equatable {
+
+    public static func ==(lhs: Row, rhs: Row) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
+
 }
 
+extension Row.Accessory: Equatable {
 
-public func ==(lhs: Row.Accessory, rhs: Row.Accessory) -> Bool {
-    switch (lhs, rhs) {
-    case (.none, .none): return true
-    case (.disclosureIndicator, .disclosureIndicator): return true
-    case (.detailDisclosureButton(_), .detailDisclosureButton(_)): return true
-    case (.checkmark, .checkmark): return true
-    case (.detailButton(_), .detailButton(_)): return true
-    case (.view(let l), .view(let r)): return l == r
-    default: return false
+    public static func ==(lhs: Row.Accessory, rhs: Row.Accessory) -> Bool {
+        switch (lhs, rhs) {
+            case (.none, .none): return true
+            case (.disclosureIndicator, .disclosureIndicator): return true
+            case (.detailDisclosureButton(_), .detailDisclosureButton(_)): return true
+            case (.checkmark, .checkmark): return true
+            case (.detailButton(_), .detailButton(_)): return true
+            case (.view(let l), .view(let r)): return l == r
+            default: return false
+        }
     }
+
 }
